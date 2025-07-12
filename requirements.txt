@@ -1,0 +1,11 @@
+setuptools
+pandas
+numpy
+seaborn
+matplotlib
+scikit-learn
+catboost
+xgboost
+lightgbm
+tqdm
+-e .
