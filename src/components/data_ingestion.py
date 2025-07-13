@@ -1,11 +1,12 @@
 import os
 import sys
-from src.exception import CustomException
-from src.logger import logging
 
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from dataclasses import dataclass
+from sklearn.model_selection import train_test_split
+
+from src.exception import CustomException
+from src.logger import logging
 
 @dataclass
 class DataIngestionConfig:
@@ -18,6 +19,9 @@ class DataIngestion:
         self.ingestion_config = DataIngestionConfig()
         
     def initiate_data_ingestion(self):
+        '''
+        This function is responsible for ingesting the data from the source
+        '''
         logging.info("Entered the data ingestion method or component")
         try:
             df = pd.read_csv('notebook/data/train.csv')                                             #TODO: change to the actual path of the data source
