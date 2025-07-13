@@ -8,5 +8,4 @@ catboost
 xgboost
 lightgbm
 tqdm
-dill
 -e .
