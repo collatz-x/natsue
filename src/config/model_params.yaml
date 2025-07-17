@@ -1,0 +1,116 @@
+models:
+  Logistic Regression:
+    class_weight: balanced
+    C:
+      type: numpy.logspace
+      args: [-2, 1, 20]
+    penalty: [l1, l2, elasticnet, None]
+    solver: [liblinear, saga, sag]
+    max_iter:
+      type: numpy.arange
+      args: [100, 1000, 100]
+
+  Decision Tree:
+    class_weight: [balanced, balanced_subsample]
+    max_depth:
+      type: numpy.arange
+      args: [2, 20, 2]
+    min_samples_split:
+      type: numpy.arange
+      args: [2, 20, 2]
+    min_samples_leaf:
+      type: numpy.arange
+      args: [1, 10, 1]
+    max_features: [sqrt, log2, None]
+    criterion: [gini, entropy, log_loss]
+
+  Random Forest:
+    class_weight: [balanced, balanced_subsample]
+    n_estimators:
+      type: numpy.arange
+      args: [100, 1000, 100]
+    max_depth:
+      type: numpy.arange
+      args: [2, 20, 2]
+    min_samples_split:
+      type: numpy.arange
+      args: [2, 20, 2]
+    min_samples_leaf:
+      type: numpy.arange
+      args: [1, 10, 1]
+    max_features: [sqrt, log2, None]
+    criterion: [gini, entropy, log_loss]
+
+  XGBoost:
+    objective: binary:logistic
+    scale_pos_weight:
+      type: numpy.arange
+      args: [1, 10, 2]
+    eval_metric: [auc, logloss, error]
+    n_estimators:
+      type: numpy.arange
+      args: [100, 1000, 100]
+    learning_rate:
+      type: numpy.logspace
+      args: [-3, -1, 12]
+    max_depth:
+      type: numpy.arange
+      args: [2, 20, 2]
+    subsample:
+      type: numpy.arange
+      args: [0.5, 1, 0.1]
+    colsample_bytree:
+      type: numpy.arange
+      args: [0.5, 1, 0.1]
+    gamma: [0, 0.1, 0.2, 0.5, 1, 2, 5]
+    alpha:
+      type: numpy.logspace
+      args: [-3, 1, 12]
+    lambda:
+      type: numpy.logspace
+      args: [-2, 1, 12]
+
+  LightGBM:
+    objective: binary
+    scale_pos_weight:
+      type: numpy.arange
+      args: [1, 10, 2]
+    metric: [auc, binary, average_precision]
+    n_estimators:
+      type: numpy.arange
+      args: [100, 1000, 100]
+    learning_rate:
+      type: numpy.logspace
+      args: [-3, -1, 12]
+    max_depth:
+      type: numpy.arange
+      args: [2, 20, 2]
+    subsample:
+      type: numpy.arange
+      args: [0.5, 1, 0.1]
+    colsample_bytree:
+      type: numpy.arange
+      args: [0.5, 1, 0.1]
+    reg_alpha:
+      type: numpy.logspace
+      args: [-3, 1, 12]
+    reg_lambda:
+      type: numpy.logspace
+      args: [-2, 1, 12]
+
+  CatBoost:
+    objective: [Logloss, CrossEntropy]
+    auto_class_weights: [Balanced, SqrtBalanced]
+    eval_metric: [AUC, Logloss, F1, Recall, Precision]
+    iterations:
+      type: numpy.arange
+      args: [100, 1000, 100]
+    learning_rate:
+      type: numpy.logspace
+      args: [-3, -1, 12]
+    depth:
+      type: numpy.arange
+      args: [2, 16, 2]
+    l2_leaf_reg:
+      type: numpy.arange
+      args: [1, 10, 1]
