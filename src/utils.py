@@ -27,6 +27,8 @@ def save_object(file_path, obj):
         with open(file_path, "wb") as file_obj:
             pickle.dump(obj, file_obj)
 
+        logging.info(f"Model object successfully saved at {file_path}")
+
     except Exception as e:
         raise CustomException(e, sys)
     
@@ -60,11 +62,18 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, params):
                 random_state=42
             )
 
+            logging.info(f"RandomizedSearchCV initialized for {name}")
+
             # Fit the model for hyperparameter tuning using RandomizedSearchCV
             rs.fit(X_train, y_train)
 
+            logging.info(f"RandomizedSearchCV completed for {name}")
+
             # Set best parameters to the model instance
             model.set_params(**rs.best_params_)
+
+            logging.info(f"Best parameters set for {name}: {rs.best_params_}")
+            logging.info(f"Model training using best parameters started for {name}")
 
             # Train the model on the full training set
             model.fit(X_train, y_train)
