@@ -100,6 +100,17 @@ def evaluate_models(X_train, y_train, X_test, y_test, models, params):
         raise CustomException(e, sys)
     
 
+def read_yaml(file_path: str) -> dict:
+    '''
+    This function is responsible for reading the yaml file
+    '''
+    try:
+        with open(file_path, 'r') as file:
+            return yaml.safe_load(file)
+    except Exception as e:
+        raise CustomException(e, sys)
+
+
 def load_model_params(config_path='config/model_params.yaml'):
     '''
     This function is responsible for loading the model parameters

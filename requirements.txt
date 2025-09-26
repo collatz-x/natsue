@@ -9,4 +9,5 @@ xgboost
 lightgbm
 tqdm
 pyyaml
+pyarrow
 -e .
