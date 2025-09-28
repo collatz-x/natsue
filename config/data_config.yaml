@@ -1,5 +1,8 @@
-data_ingestion:
+bronze_ingestion:
   source_path: notebook/data/train.csv
+
+data_ingestion:
+  source_path: notebook/data/train.csv    #TODO: change to actual path of gold data mart
   random_state: 42
   test_size: 0.2
   val_size: 0.25
