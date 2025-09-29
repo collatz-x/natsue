@@ -1,6 +1,7 @@
 import os
 import sys
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -15,17 +16,36 @@ class SilverIngestionConfig:
     '''Configuration for the silver layer data ingestion component'''
     bronze_base_path: str = os.path.join('artifacts', 'bronze')
     silver_base_path: str = os.path.join('artifacts', 'silver')
-    file_name: str = 'silver_data.parquet'
 
-    def get_bronze_partition_path(self, year: int, month: int) -> str:
-        '''Generate bronze partition path for reading'''
-        partition_path = f"{year}/{month:02d}"
-        return os.path.join(self.bronze_base_path, partition_path, 'bronze_data.parquet')
+    def get_bronze_partition_path(self, year: int, month: int, file_name: str) -> str:
+        '''
+        Generate bronze partition path for reading
+        
+        Args:
+            year: The year of the data
+            month: The month of the data
+            file_name: The name of the file
 
-    def get_silver_partition_path(self, year: int, month: int) -> str:
-        '''Generate silver partition path for writing'''
+        Returns:
+            str: Complete partition path
+        '''
         partition_path = f"{year}/{month:02d}"
-        return os.path.join(self.silver_base_path, partition_path, self.file_name)
+        return os.path.join(self.bronze_base_path, partition_path, file_name)
+
+    def get_silver_partition_path(self, year: int, month: int, file_name: str) -> str:
+        '''
+        Generate silver partition path for writing
+
+        Args:
+            year: The year of the data
+            month: The month of the data
+            file_name: The name of the file
+
+        Returns:
+            str: Complete partition path
+        '''
+        partition_path = f"{year}/{month:02d}"
+        return os.path.join(self.silver_base_path, partition_path, file_name)
 
 
 class SilverIngestion:
@@ -139,7 +159,7 @@ class SilverIngestion:
         Discover and load bronze partitions for ingestion
 
         Returns:
-            list: List of tuples (year, month) for available participations
+            list: List of tuples (year, month) for available partitions
         '''
         try:
             logging.info("Discovering and loading bronze partitions")
@@ -149,28 +169,46 @@ class SilverIngestion:
             if not os.path.exists(bronze_base):
                 raise FileNotFoundError(f"Bronze base path not found: {bronze_base}")
 
-            # Scan for level 1 partitions (year directories)
-            for year_dir in os.listdir(bronze_base):
-                year_path = os.path.join(bronze_base, year_dir)
-                if os.path.isdir(year_path) and year_dir.isdigit():
-                    year = int(year_dir)
+            # Get bronze file name from config
+            bronze_file_name = self.params['bronze_file_name']
 
-                    # Scan for level 2 partitions (month directories)
-                    for month_dir in os.listdir(year_path):
-                        month_path = os.path.join(year_path, month_dir)
-                        if os.path.isdir(month_path) and month_dir.isdigit():
-                            month = int(month_dir)
+            # Get all the partition files
+            partition_files = Path(bronze_base).glob(f'*/*/{bronze_file_name}')
 
-                            # Check if data file exists
-                            data_file = os.path.join(month_path, 'bronze_data.parquet')
-                            if os.path.exists(data_file):
-                                partitions.append((year, month))
+            # Extract year and month from the partition file path
+            for partition_file in partition_files:
+                try:
+                    month_dir = partition_file.parent
+                    year_dir = month_dir.parent
+
+                    # Validate that parents are directories
+                    if not month_dir.is_dir() or not year_dir.is_dir():
+                        logging.warning(f"Parent paths are not directories for: {partition_file}")
+                        continue
+
+                    # Validate and convert directory names to integers
+                    if month_dir.name.isdigit() and year_dir.name.isdigit():
+                        month = int(month_dir.name)
+                        year = int(year_dir.name)
+
+                        if 1 <= month <= 12:
+                            partitions.append((year, month))
+                            logging.info(f"Found valid partition: {year}-{month:02d}")
+                        else:
+                            logging.warning(f"Invalid month value in partition: {partition_file}")
+                    else:
+                        logging.warning(f"Invalid directory names in partition: {partition_file}")
+                
+                except ValueError:
+                    logging.warning(f"Invalid partition path structure: {partition_file}")
+                    continue
 
             logging.info(f"Found {len(partitions)} available bronze partitions")
             return sorted(partitions)
 
         except Exception as e:
             raise CustomException(e, sys)
+
 
     def save_silver_partitions(self, df: pd.DataFrame, year: int, month: int) -> str:
         '''
@@ -185,8 +223,11 @@ class SilverIngestion:
             str: Path to saved partition
         '''
         try:
+            # Get silver file name from config
+            silver_file_name = self.params['silver_file_name']
+            
             # Generate partition path
-            partition_path = self.silver_ingestion_config.get_silver_partition_path(year, month)
+            partition_path = self.silver_ingestion_config.get_silver_partition_path(year, month, silver_file_name)
             partition_dir = os.path.dirname(partition_path)     # Retrieve directory path without the file name
 
             # Create partition directory if it doesn't exist
@@ -218,12 +259,15 @@ class SilverIngestion:
 
             saved_paths = []
 
+            # Get bronze file name from config
+            bronze_file_name = self.params['bronze_file_name']
+
             # Process each partition
             for year, month in bronze_partitions:
                 logging.info(f"Processing bronze partition {year}-{month:02d}")
 
                 # Load bronze data
-                bronze_path = self.silver_ingestion_config.get_bronze_partition_path(year, month)
+                bronze_path = self.silver_ingestion_config.get_bronze_partition_path(year, month, bronze_file_name)
                 df = pd.read_parquet(bronze_path)
                 logging.info(f"Loaded bronze partition {year}-{month:02d}: {len(df)} records")
 

@@ -14,21 +14,21 @@ from src.utils import read_yaml, convert_to_datetime
 class BronzeIngestionConfig:
     '''Configuration for the bronze layer data ingestion component'''
     bronze_base_path: str = os.path.join('artifacts', 'bronze')
-    file_name: str = 'bronze_data.parquet'
 
-    def get_bronze_partition_path(self, year: int, month: int) -> str:
+    def get_bronze_partition_path(self, year: int, month: int, file_name: str) -> str:
         '''
         Generate the full partition path for bronze data storage
 
         Args:
             year: The year of the data
             month: The month of the data
+            file_name: The name of the file
 
         Returns:
             str: Complete partition path
         '''
         partition_path = f"{year}/{month:02d}"
-        return os.path.join(self.bronze_base_path, partition_path, self.file_name)
+        return os.path.join(self.bronze_base_path, partition_path, file_name)
 
 
 class BronzeIngestion:
@@ -82,6 +82,9 @@ class BronzeIngestion:
             logging.info("Creating and saving partitions")
             saved_paths = []
 
+            # Get bronze file name from config
+            bronze_file_name = self.params['bronze_file_name']
+
             # Group by year and month
             df['year'] = df['DisbursalDate'].dt.year
             df['month'] = df['DisbursalDate'].dt.month
@@ -92,7 +95,7 @@ class BronzeIngestion:
                 partition_df = df.drop(['year', 'month'], axis=1)
 
                 # Generate partition path
-                partition_path = self.bronze_ingestion_config.get_bronze_partition_path(year, month)
+                partition_path = self.bronze_ingestion_config.get_bronze_partition_path(year, month, bronze_file_name)
                 partition_dir = os.path.dirname(partition_path)     # Retrieve directory path without the file name
 
                 # Create partition directory if it doesn't exist

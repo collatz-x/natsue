@@ -1,7 +1,10 @@
 bronze_ingestion:
   source_path: notebook/data/train.csv
+  bronze_file_name: bronze_data.parquet
 
 silver_ingestion:
+  bronze_file_name: bronze_data.parquet
+  silver_file_name: silver_data.parquet
 
 data_ingestion:
   source_path: notebook/data/train.csv    #TODO: change to actual path of gold data mart
