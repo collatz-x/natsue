@@ -13,7 +13,9 @@ from src.utils import read_yaml, convert_to_datetime, convert_to_categorical, co
 
 @dataclass
 class SilverIngestionConfig:
-    '''Configuration for the silver layer data ingestion component'''
+    '''
+    Configuration for the silver layer data ingestion component
+    '''
     bronze_base_path: str = os.path.join('artifacts', 'bronze')
     silver_base_path: str = os.path.join('artifacts', 'silver')
 

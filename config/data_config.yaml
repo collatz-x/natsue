@@ -11,7 +11,11 @@ gold_ingestion:
   gold_file_name: gold_data.parquet
 
 data_ingestion:
-  source_path: gold_data.parquet
+  gold_file_name: gold_data.parquet
+  train_file_name: train.parquet
+  val_file_name: val.parquet
+  test_file_name: test.parquet
+  full_file_name: data.parquet
   random_state: 42
   test_size: 0.2
   val_size: 0.25

@@ -3,7 +3,6 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from src.exception import CustomException
@@ -13,7 +12,9 @@ from src.utils import read_yaml
 
 @dataclass
 class GoldIngestionConfig:
-    '''Configuration for the gold layer data ingestion component'''
+    '''
+    Configuration for the gold layer data ingestion component
+    '''
     silver_base_path: str = os.path.join('artifacts', 'silver')
     gold_base_path: str = os.path.join('artifacts', 'gold')
 
