@@ -9,6 +9,7 @@ from src.exception import CustomException
 from src.logger import logging
 from src.utils import read_yaml
 
+
 @dataclass
 class DataIngestionConfig:
     train_data_path: str = os.path.join('artifacts', 'train.parquet')
@@ -27,7 +28,7 @@ class DataIngestion:
         '''
         logging.info("Entered the data ingestion method or component")
         try:
-            df = pd.read_csv(self.params['source_path'])                                             #TODO: change to the actual path of the data source
+            df = pd.read_csv(self.params['source_path'])
             logging.info('Read the dataset as dataframe')
             logging.info(f'Dataset shape: {df.shape}')
 
@@ -75,8 +76,3 @@ class DataIngestion:
             )
         except Exception as e:
             raise CustomException(e, sys)
-
-
-if __name__ == "__main__":
-    obj = DataIngestion()
-    obj.initiate_data_ingestion()

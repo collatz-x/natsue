@@ -137,16 +137,21 @@ class SilverIngestion:
             logging.info("Starting business logic feature engineering")
 
             # Calculate age at disbursement
-            df['age'] = df['DisbursalDate'].dt.year - df['Date.of.Birth'].dt.year
+            df['AGE'] = df['DisbursalDate'].dt.year - df['Date.of.Birth'].dt.year
             logging.info("Created age feature (age at disbursement)")
 
             # Calculate credit utilization ratio
-            df = calculate_ratio(df, 'PRI.DISBURSED.AMOUNT', 'PRI.SANCTIONED.AMOUNT', 'credit_utilization')
+            df = calculate_ratio(df, 'PRI.DISBURSED.AMOUNT', 'PRI.SANCTIONED.AMOUNT', 'CREDIT.UTILIZATION')
             logging.info("Created credit utilization ratio feature")
 
             # Calculate loan default ratio
-            df = calculate_ratio(df, 'PRI.OVERDUE.ACCTS', 'PRI.ACTIVE.ACCTS', 'default_ratio')
+            df = calculate_ratio(df, 'PRI.OVERDUE.ACCTS', 'PRI.ACTIVE.ACCTS', 'PRI.DEFAULT.RATIO')
             logging.info("Created loan default ratio feature")
+
+            # Apply log transformation
+            df['log_disbursed_amount'] = np.log1p(df['disbursed_amount'])
+            df['log_asset_cost'] = np.log1p(df['asset_cost'])
+            logging.info("Created log transformed features")
 
             logging.info("Business logic feature engineering completed")
             return df

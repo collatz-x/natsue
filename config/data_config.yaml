@@ -6,9 +6,28 @@ silver_ingestion:
   bronze_file_name: bronze_data.parquet
   silver_file_name: silver_data.parquet
 
+gold_ingestion:
+  silver_file_name: silver_data.parquet
+  gold_file_name: gold_data.parquet
+
 data_ingestion:
-  source_path: notebook/data/train.csv    #TODO: change to actual path of gold data mart
+  source_path: gold_data.parquet
   random_state: 42
   test_size: 0.2
   val_size: 0.25
   target_column: loan_default
+
+feature_selection:
+  - Employment.Type
+  - PRI.CURRENT.BALANCE
+  - PRIMARY.INSTAL.AMT
+  - NEW.ACCTS.IN.LAST.SIX.MONTHS
+  - DELINQUENT.ACCTS.IN.LAST.SIX.MONTHS
+  - AVERAGE.ACCT.AGE
+  - CREDIT.HISTORY.LENGTH
+  - NO.OF_INQUIRIES
+  - AGE
+  - PRI.DEFAULT.RATIO
+  - CREDIT.UTILIZATION
+  - log_disbursed_amount
+  - loan_default

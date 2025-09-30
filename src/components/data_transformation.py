@@ -13,6 +13,7 @@ from src.exception import CustomException
 from src.logger import logging
 from src.utils import save_object
 
+
 @dataclass
 class DataTransformationConfig:
     preprocessor_obj_file_path = os.path.join('artifacts', 'preprocessor.pkl')
